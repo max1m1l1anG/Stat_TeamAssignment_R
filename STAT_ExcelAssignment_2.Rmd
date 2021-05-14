@@ -1,0 +1,232 @@
+---
+title: "Statistics: Team Assignment"
+output: html_notebook
+author: "Maximilian Grotz"
+---
+
+# Data Preparation 
+
+Please just change the sample file you would like to import and insert your $\alpha$ (alpha). 
+
+```{r warning = FALSE}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+
+sample <- read_excel("Sample3.xlsx", 
+    col_types = c("numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "skip", "skip", "skip"))
+
+alpha = 0.07
+
+```
+
+# Question 1
+
+Determine for each of the variables EMPLOYEE, PROFIT, DCOSTS and GROWTH whether it is a qualitative or quantitative variable. Furthermore, for each qualitative variable indicate whether it is nominal or ordinal and for each quantitative variable indicate whether it is discrete or continuous.
+
+| Variable | Type         | Specific   |
+| ---------| -------------| -----      |
+| Employee | Quantitative | Discrete   |
+| Profit   | Quantitative | Continuous |
+| dCost    | Qualitative  | Nominal    |
+| Growth   | Qualitative  | Ordinal    |
+
+
+# Question 2
+
+Compute the sample median, the sample mean, the sample variance and the sample standard deviation for the variable EMPLOYEE.
+
+```{r}
+
+median_EMP <- median(sample$EMPLOYEE)
+mean_EMP <- mean(sample$EMPLOYEE)
+svar_EMP <- var(sample$EMPLOYEE)
+ssd_EMP <- sd(sample$EMPLOYEE)
+
+# Calculating the sample variance "by hand"
+
+variance_sample <- sample %>%
+  mutate(dev_squared = (EMPLOYEE - mean_EMP)^2)
+manual_svar <- sum(variance_sample$dev_squared) / (nrow(variance_sample) - 1)
+
+
+cat(paste("The median is", round(median_EMP, 4),
+          "\nThe mean is", round(mean_EMP, 4),
+          "\nThe sample variance is", round(svar_EMP, 4),
+          "\nThe (manual) sample variance is", round(manual_svar, 4), 
+          "\nThe sample standard deviation is", round(ssd_EMP, 4), 
+          "\nThe (manual) sample standard deviation is", round(manual_svar^0.5,4)))
+
+```
+
+
+# Question 3
+
+Compute the sample median and mode for the variable GROWTH (Use the numerical values assigned to the categories; 1 = low, 2 = medium, 3 = high.
+
+```{r}
+median_growth <- median(sample$GROWTH)
+
+mode <- function(x){which.max(tabulate(x))}
+mode_growth <- mode(sample$GROWTH)
+
+
+cat(paste("The median is", median_growth, "\nThe mode is", mode_growth))
+
+```
+
+
+
+# Question 4
+
+Determine the relative frequencies of “Technology”, “Finance”, “Healthcare” and “Other” for the variable SECTOR.
+
+```{r}
+relfreq_SECTOR <- table(sample$SECTOR) / length(sample$SECTOR)
+
+index_relfreq <- 1
+
+for (type in c("Technology", "Finance", "Healthcare", "Other")) {
+  print(paste("The relative frequency of", type, "is", round(relfreq_SECTOR[index_relfreq], 4)))
+  index_relfreq <- index_relfreq +1
+}
+
+```
+
+
+# Question 5
+
+Determine the sample mean and sample standard deviation of the variable COMPETITORS. Compute also the sample proportion of companies that have less than 5 competitors
+
+```{r}
+mean_COMP <- mean(sample$COMPETITORS)
+ssd_COMP <- mean(sample$COMPETITORS)
+
+prop_less5 <- sum(sample$COMPETITORS < 5) / length(sample$COMPETITORS)
+
+
+cat(paste("The sample mean of COMPETITORS is", round(mean_COMP, 4), 
+          "\nThe sample standard deviation of COMPETITORS is", round(ssd_COMP, 4), 
+          "\nThe sample proportion of companies that have less than 5 competitors is", round(prop_less5, 4)))
+
+```
+
+
+
+# Question 6
+
+1. Compute for the variable PROFIT the intervals around the sample mean with 1.25, 1.5, 1.75 and 2 sample standard deviations. In other words, compute ($\bar{x}$ − 1.25s, $\bar{x}$ + 1.25s), ($\bar{x}$ − 1.5s, $\bar{x}$ + 1.5s), ($\bar{x}$ − 1.75s, $\bar{x}$ + 1.75s) and ($\bar{x}$ − 2s, $\bar{x}$ + 2s). Report the lower and upper bounds of these intervals. 
+
+2. Compute the minimum proportion of observations included in these intervals according to Chebyshev’s rule.
+
+3. Compute the exact proportions of observations included in these intervals according to the actual data.
+
+```{r}
+mean_profit <- mean(sample$PROFIT)
+sd_profit <- sd(sample$PROFIT)
+
+sd_multiples <- c(1.25, 1.5, 1.75, 2)
+q6 <- data.frame(sd_multiples) %>%
+  mutate(lowbound = mean_profit - sd_profit * sd_multiples,
+         highbound = mean_profit + sd_profit * sd_multiples, 
+         minCheb = 1 - 1 / sd_multiples^2)
+
+
+for (i in 1:4){
+  q6$prop[i] <- sum((sample$PROFIT > q6$lowbound[i]) & (sample$PROFIT < q6$highbound[i])) / nrow(sample)
+}
+
+q6
+
+
+
+```
+
+
+
+# Question 7 
+
+1. Compute the z-scores for the variable PROFIT. Report the lowest and the highest z-score of the variable PROFIT in the sample and the value of that observation. Determine whether the value with the lowest z-score and the highest z-score are outlier values or not by using the 3$\sigma$ outlier detection method.
+
+2. Compute the sample interquartile range (IQR) for the variable PROFIT. Determine the 
+number of outliers using quartiles and IQR.
+
+```{r}
+findz_PROFIT <- function(x){
+  (x - mean_profit) / sd_profit
+}
+
+lowest_z <- findz_PROFIT(min(sample$PROFIT))
+highest_z <- findz_PROFIT(max(sample$PROFIT))
+
+cat("The lowest z-score is", lowest_z, 
+          "\nThe highest z-score is", highest_z, 
+          "\nIt is", abs(lowest_z) > 3, "that the lowest z-score is an outlier value. ", 
+          "\nIt is", abs(highest_z) > 3, "that the highest z-score is an outlier value.")
+
+
+iqr_profit <- IQR(sample$PROFIT)
+Q1_profit <- quantile(sample$PROFIT, 0.25)
+Q3_profit <- quantile(sample$PROFIT, .75)
+
+number_outliers_profit <- sum(sample$PROFIT < Q1_profit-1.5*iqr_profit) + sum(sample$PROFIT > Q3_profit+1.5*iqr_profit)
+
+cat("The number of outliers is", number_outliers_profit)
+
+```
+
+
+
+# Question 8 
+
+a) Determine (1-$\alpha$) × 100% -confidence intervals for the population means µ5 and µ6 of the 
+variables 5 and 6 (PROFIT and COMPETITORS, respectively). Report the lower and upper 
+bounds of the intervals. 
+b) Use these confidence intervals to provide the statistical conclusions of the following three 
+testing problems:
+    1. $H_0$: $\mu_5 \le 0$ against $H_1$: $\mu_5 > 0$
+    2. $H_0$: $\mu_6 \ge 0$ against $H_1$: $\mu_6 < 0$
+
+```{r}
+z_alpha2 <- qnorm(1 - alpha/ 2)
+
+lowbound_profit <- mean_profit - z_alpha2 * sd_profit / nrow(sample)^0.5
+highbound_profit <- mean_profit + z_alpha2 * sd_profit / nrow(sample)^0.5
+
+lowbound_COMP <- mean_COMP - z_alpha2 * ssd_COMP / nrow(sample)^0.5
+highbound_COMP <- mean_COMP + z_alpha2 * ssd_COMP / nrow(sample)^0.5
+
+cat("The lower bound of the CI for profit is", round(lowbound_profit, 4), "and the higher bound is", round(highbound_profit, 4), "\nThe lower bound of the CI for competitors is", round(lowbound_COMP, 4), "and the higher bound is", round(highbound_COMP, 4))
+
+```
+
+
+# Question 9
+
+Consider the following two testing problems:
+
+1. $H_0$: $p_7 \le 0.70$ against $H_1$: $p_7 > 0.7$
+2. $H_0$: $p_8 = 0.5$ against $H_1$: $p_8 \neq 0.5$
+
+where $p_7$ and $p_8$ refer to the population proportions of the companies that reduced fixed costs in 
+2020, and hired employees in 2020, respectively. Report the corresponding value of test statistics and p-values, and provide the statistical conclusions
+
+```{r}
+mean_DCOSTS <- mean(sample$DCOSTS)
+
+
+
+```
+
+
+
+
+# Question 10
+
+1. $H_0$: $\mu_2 \le 11$ against $H_1$: $\mu_2 > 11$
+2. $H_0$: $\mu_6 \ge 100$ against $H_1$: $\mu_6 < 100$
+
+where, $µ_2$ and $µ_4$ refer to the population means of the variables 2 and 4 (AGE and EMPLOYEE, respectively). Report the critical values determining the rejection regions and indicate the rejection regions. Report the value of test statistics and provide the statistical conclusions.
