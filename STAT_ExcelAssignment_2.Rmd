@@ -6,12 +6,12 @@ author: "Maximilian Grotz"
 
 # Data Preparation 
 
-Please change the sample file you would like to import and insert your $\alpha$ (alpha). 
+Change import of sample file and insert  $\alpha$ (alpha). 
 
-```{r warning = FALSE, echo=TRUE, results='hide'}
+```{r warning = FALSE}
+library(tidyverse)
 library(readxl)
 library(dplyr)
-library(tidyverse)
 
 sample <- read_excel("Sample3.xlsx", 
     col_types = c("numeric", "numeric", "numeric", 
@@ -20,7 +20,6 @@ sample <- read_excel("Sample3.xlsx",
         "skip", "skip", "skip"))
 
 alpha = 0.07
-
 ```
 
 # Question 1
@@ -40,7 +39,6 @@ Determine for each of the variables EMPLOYEE, PROFIT, DCOSTS and GROWTH whether 
 Compute the sample median, the sample mean, the sample variance and the sample standard deviation for the variable EMPLOYEE.
 
 ```{r}
-
 median_EMP <- median(sample$EMPLOYEE)
 mean_EMP <- mean(sample$EMPLOYEE)
 svar_EMP <- var(sample$EMPLOYEE)
@@ -59,7 +57,6 @@ cat(paste("The median is", round(median_EMP, 4),
           "\nThe (manual) sample variance is", round(manual_svar, 4), 
           "\nThe sample standard deviation is", round(ssd_EMP, 4), 
           "\nThe (manual) sample standard deviation is", round(manual_svar^0.5,4)))
-
 ```
 
 
@@ -75,7 +72,6 @@ mode_growth <- mode(sample$GROWTH)
 
 
 cat(paste("The median is", median_growth, "\nThe mode is", mode_growth))
-
 ```
 
 
@@ -93,7 +89,6 @@ for (type in c("Technology", "Finance", "Healthcare", "Other")) {
   print(paste("The relative frequency of", type, "is", round(relfreq_SECTOR[index_relfreq], 4)))
   index_relfreq <- index_relfreq +1
 }
-
 ```
 
 
@@ -111,7 +106,6 @@ prop_less5 <- sum(sample$COMPETITORS < 5) / length(sample$COMPETITORS)
 cat(paste("The sample mean of COMPETITORS is", round(mean_COMP, 4), 
           "\nThe sample standard deviation of COMPETITORS is", round(ssd_COMP, 4), 
           "\nThe sample proportion of companies that have less than 5 competitors is", round(prop_less5, 4)))
-
 ```
 
 
@@ -134,15 +128,10 @@ q6 <- data.frame(sd_multiples) %>%
          highbound = mean_profit + sd_profit * sd_multiples, 
          minCheb = 1 - 1 / sd_multiples^2)
 
-
 for (i in 1:4){
   q6$prop[i] <- sum((sample$PROFIT > q6$lowbound[i]) & (sample$PROFIT < q6$highbound[i])) / nrow(sample)
 }
-
 round(q6,4)
-
-
-
 ```
 
 
@@ -175,7 +164,6 @@ Q3_profit <- quantile(sample$PROFIT, .75)
 number_outliers_profit <- sum(sample$PROFIT < Q1_profit-1.5*iqr_profit) + sum(sample$PROFIT > Q3_profit+1.5*iqr_profit)
 
 cat("The number of outliers is", number_outliers_profit)
-
 ```
 
 
@@ -206,8 +194,6 @@ H0_COMP <- ifelse(lowbound_COMP > 6, "Do not reject H0", "Reject H0")
 cat("The lower bound of the CI for profit is", round(lowbound_profit, 4), "and the higher bound is", round(highbound_profit, 4), "\nThe lower bound of the CI for competitors is", round(lowbound_COMP, 4), "and the higher bound is", round(highbound_COMP, 4))
 
 cat("\n\nPROFIT:\n", H0_profit, "\n\nCOMPETITORS:\n", H0_COMP)
-
-
 ```
 
 
@@ -231,20 +217,17 @@ TestStat_DNEWHIRES <- (mean_DCOSTS - 0.5) / ((mean_DCOSTS * (1 - mean_DCOSTS)/nr
 pval_DNEWHIRES <- pnorm(-TestStat_DNEWHIRES, 0, 1)
 
 H0_DCOSTS <- ifelse(pval_DCOSTS < alpha, "Do not reject H0", "Reject H0")
-H0_DNEWHIRES <- ifelse(pval_DNEWHIRES < alpha, "Do not reject H0", "Reject H0")
+H0_DNEWHIRES <- ifelse((pval_DNEWHIRES > alpha / 2), "Do not reject H0", "Reject H0")
 
 cat("DCOSTS (Companies that reduced fixed costs in 2020)", 
     "\nTest statistic:", TestStat_DCOSTS, 
     "\np-value:", pval_DCOSTS, 
     "\nStatistical conclusion:", H0_DCOSTS,
-    "\n\nDNEWHIRES (Companies that hired employees in 2020",
+    "\n\nDNEWHIRES (Companies that hired employees in 2020)",
     "\nTest statistic:", TestStat_DNEWHIRES, 
     "\np-value:", pval_DNEWHIRES, 
     "\nStatistical conclusion:", H0_DNEWHIRES)
-
-
 ```
-
 
 
 
@@ -254,3 +237,31 @@ cat("DCOSTS (Companies that reduced fixed costs in 2020)",
 2. $H_0$: $\mu_6 \ge 100$ against $H_1$: $\mu_6 < 100$
 
 where, $µ_2$ and $µ_4$ refer to the population means of the variables 2 and 4 (AGE and EMPLOYEE, respectively). Report the critical values determining the rejection regions and indicate the rejection regions. Report the value of test statistics and provide the statistical conclusions.
+
+```{r}
+mean_AGE <- mean(sample$AGE)
+sd_AGE <- sd(sample$AGE)
+z_AGE <- qnorm(1-alpha)
+TestStat_AGE <- (mean_AGE - 11)/(sd_AGE / nrow(sample)^0.5)
+
+H0_AGE <- ifelse(z_AGE > TestStat_AGE, "Do not reject H0", "Reject H0")
+
+cat("Age:", 
+    "The critical value is", z_AGE,
+    "\nThe rejection region is to the right side of the critical value.",
+    "\nThe value of the test statistic is", TestStat_AGE, 
+    "\nThe statistical conclusion is:", H0_AGE, 
+    "\n\n")
+
+z_EMP <- qnorm(alpha)
+TestStat_EMP <- (mean_EMP - 11)/(ssd_EMP / nrow(sample)^0.5)
+
+H0_EMP <- ifelse(z_EMP < TestStat_EMP, "Do not reject H0", "Reject H0")
+
+cat("Employment:", 
+    "\nThe critical value is", z_EMP,
+    "\nThe rejection region is to the left side of the critical value.",
+    "\nThe value of the test statistic is", TestStat_EMP, 
+    "\nThe statistical conclusion is:", H0_EMP)
+```
+
