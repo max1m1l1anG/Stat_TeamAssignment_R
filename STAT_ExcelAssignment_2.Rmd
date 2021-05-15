@@ -98,7 +98,7 @@ Determine the sample mean and sample standard deviation of the variable COMPETIT
 
 ```{r}
 mean_COMP <- mean(sample$COMPETITORS)
-ssd_COMP <- mean(sample$COMPETITORS)
+ssd_COMP <- sd(sample$COMPETITORS)
 
 prop_less5 <- sum(sample$COMPETITORS < 5) / length(sample$COMPETITORS)
 
