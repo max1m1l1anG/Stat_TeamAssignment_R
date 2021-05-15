@@ -8,7 +8,7 @@ author: "Maximilian Grotz"
 
 Change import of sample file and insert  $\alpha$ (alpha). 
 
-```{r warning = FALSE}
+```{r warning = FALSE, message=FALSE}
 library(tidyverse)
 library(readxl)
 library(dplyr)
@@ -191,9 +191,8 @@ highbound_COMP <- mean_COMP + z_alpha2 * ssd_COMP / nrow(sample)^0.5
 H0_profit <- ifelse(highbound_profit < 0, "Do not reject H0", "Reject H0")
 H0_COMP <- ifelse(lowbound_COMP > 6, "Do not reject H0", "Reject H0")
 
-cat("The lower bound of the CI for profit is", round(lowbound_profit, 4), "and the higher bound is", round(highbound_profit, 4), "\nThe lower bound of the CI for competitors is", round(lowbound_COMP, 4), "and the higher bound is", round(highbound_COMP, 4))
+cat("The lower bound of the CI for profit is", round(lowbound_profit, 4), "and the higher bound is", round(highbound_profit, 4), "\nThe lower bound of the CI for competitors is", round(lowbound_COMP, 4), "and the higher bound is", round(highbound_COMP, 4), "\n\nPROFIT:\n", H0_profit, "\n\nCOMPETITORS:\n", H0_COMP)
 
-cat("\n\nPROFIT:\n", H0_profit, "\n\nCOMPETITORS:\n", H0_COMP)
 ```
 
 
