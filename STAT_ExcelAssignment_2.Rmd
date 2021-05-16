@@ -191,7 +191,10 @@ highbound_COMP <- mean_COMP + z_alpha2 * ssd_COMP / nrow(sample)^0.5
 H0_profit <- ifelse(highbound_profit < 0, "Do not reject H0", "Reject H0")
 H0_COMP <- ifelse(lowbound_COMP > 6, "Do not reject H0", "Reject H0")
 
-cat("The lower bound of the CI for profit is", round(lowbound_profit, 4), "and the higher bound is", round(highbound_profit, 4), "\nThe lower bound of the CI for competitors is", round(lowbound_COMP, 4), "and the higher bound is", round(highbound_COMP, 4), "\n\nPROFIT:\n", H0_profit, "\n\nCOMPETITORS:\n", H0_COMP)
+cat("The lower bound of the CI for profit is", round(lowbound_profit, 4), "and the higher bound is", round(highbound_profit, 4), 
+    "\nThe lower bound of the CI for competitors is", round(lowbound_COMP, 4), "and the higher bound is", round(highbound_COMP, 4), 
+    "\n\nPROFIT:\n", H0_profit, 
+    "\n\nCOMPETITORS:\n", H0_COMP)
 
 ```
 
@@ -208,14 +211,14 @@ where $p_7$ and $p_8$ refer to the population proportions of the companies that 
 
 ```{r}
 mean_DCOSTS <- mean(sample$DCOSTS)
-TestStat_DCOSTS <- (mean_DCOSTS - 0.7) / ((mean_DCOSTS * (1 - mean_DCOSTS)/nrow(sample))^0.5)
+TestStat_DCOSTS <- (mean_DCOSTS - 0.7) / ((0.7 * (1 - 0.7)/nrow(sample))^0.5)
 pval_DCOSTS <- ifelse(TestStat_DCOSTS > 0, pnorm(-TestStat_DCOSTS, 0, 1), pnorm(TestStat_DCOSTS, 0, 1))
 
 mean_DNEWHIRES <- mean(sample$DNEWHIRES)
-TestStat_DNEWHIRES <- (mean_DCOSTS - 0.5) / ((mean_DCOSTS * (1 - mean_DCOSTS)/nrow(sample))^0.5)
+TestStat_DNEWHIRES <- (mean_DNEWHIRES - 0.5) / ((0.5 * (1 - 0.5)/nrow(sample))^0.5)
 pval_DNEWHIRES <- 2 * ifelse(TestStat_DNEWHIRES > 0, pnorm(-TestStat_DNEWHIRES, 0, 1), pnorm(TestStat_DNEWHIRES, 0, 1))
 
-H0_DCOSTS <- ifelse(pval_DCOSTS < alpha, "Do not reject H0", "Reject H0")
+H0_DCOSTS <- ifelse(pval_DCOSTS > alpha, "Do not reject H0", "Reject H0")
 H0_DNEWHIRES <- ifelse((pval_DNEWHIRES > alpha), "Do not reject H0", "Reject H0")
 
 cat("DCOSTS (Companies that reduced fixed costs in 2020)", 
@@ -246,14 +249,14 @@ TestStat_AGE <- (mean_AGE - 11)/(sd_AGE / nrow(sample)^0.5)
 H0_AGE <- ifelse(z_AGE > TestStat_AGE, "Do not reject H0", "Reject H0")
 
 cat("Age:", 
-    "The critical value is", z_AGE,
+    "\nThe critical value is", z_AGE,
     "\nThe rejection region is to the right side of the critical value.",
     "\nThe value of the test statistic is", TestStat_AGE, 
     "\nThe statistical conclusion is:", H0_AGE, 
     "\n\n")
 
 z_EMP <- qnorm(alpha)
-TestStat_EMP <- (mean_EMP - 11)/(ssd_EMP / nrow(sample)^0.5)
+TestStat_EMP <- (mean_EMP - 100)/(ssd_EMP / nrow(sample)^0.5)
 
 H0_EMP <- ifelse(z_EMP < TestStat_EMP, "Do not reject H0", "Reject H0")
 
