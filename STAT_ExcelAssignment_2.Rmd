@@ -209,14 +209,14 @@ where $p_7$ and $p_8$ refer to the population proportions of the companies that 
 ```{r}
 mean_DCOSTS <- mean(sample$DCOSTS)
 TestStat_DCOSTS <- (mean_DCOSTS - 0.7) / ((mean_DCOSTS * (1 - mean_DCOSTS)/nrow(sample))^0.5)
-pval_DCOSTS <- pnorm(-TestStat_DCOSTS, 0, 1)
+pval_DCOSTS <- ifelse(TestStat_DCOSTS > 0, pnorm(-TestStat_DCOSTS, 0, 1), pnorm(TestStat_DCOSTS, 0, 1))
 
 mean_DNEWHIRES <- mean(sample$DNEWHIRES)
 TestStat_DNEWHIRES <- (mean_DCOSTS - 0.5) / ((mean_DCOSTS * (1 - mean_DCOSTS)/nrow(sample))^0.5)
-pval_DNEWHIRES <- pnorm(-TestStat_DNEWHIRES, 0, 1)
+pval_DNEWHIRES <- 2 * ifelse(TestStat_DNEWHIRES > 0, pnorm(-TestStat_DNEWHIRES, 0, 1), pnorm(TestStat_DNEWHIRES, 0, 1))
 
 H0_DCOSTS <- ifelse(pval_DCOSTS < alpha, "Do not reject H0", "Reject H0")
-H0_DNEWHIRES <- ifelse((pval_DNEWHIRES > alpha / 2), "Do not reject H0", "Reject H0")
+H0_DNEWHIRES <- ifelse((pval_DNEWHIRES > alpha), "Do not reject H0", "Reject H0")
 
 cat("DCOSTS (Companies that reduced fixed costs in 2020)", 
     "\nTest statistic:", TestStat_DCOSTS, 
