@@ -179,13 +179,13 @@ testing problems:
     2. $H_0$: $\mu_6 \ge 6$ against $H_1$: $\mu_6 < 6$
 
 ```{r}
-z_alpha2 <- qnorm(1 - alpha/ 2)
+t_alpha2_300 <- qt(1 - alpha/ 2, 300)
 
-lowbound_profit <- mean_profit - z_alpha2 * sd_profit / nrow(sample)^0.5
-highbound_profit <- mean_profit + z_alpha2 * sd_profit / nrow(sample)^0.5
+lowbound_profit <- mean_profit - t_alpha2_300 * sd_profit / nrow(sample)^0.5
+highbound_profit <- mean_profit + t_alpha2_300 * sd_profit / nrow(sample)^0.5
 
-lowbound_COMP <- mean_COMP - z_alpha2 * ssd_COMP / nrow(sample)^0.5
-highbound_COMP <- mean_COMP + z_alpha2 * ssd_COMP / nrow(sample)^0.5
+lowbound_COMP <- mean_COMP - t_alpha2_300 * ssd_COMP / nrow(sample)^0.5
+highbound_COMP <- mean_COMP + t_alpha2_300 * ssd_COMP / nrow(sample)^0.5
 
 
 H0_profit <- ifelse(highbound_profit < 0, "Do not reject H0", "Reject H0")
@@ -243,25 +243,25 @@ where, $µ_2$ and $µ_4$ refer to the population means of the variables 2 and 4 
 ```{r}
 mean_AGE <- mean(sample$AGE)
 sd_AGE <- sd(sample$AGE)
-z_AGE <- qnorm(1-alpha)
+z_alpha_300_AGE <- qt(1-alpha, 300)
 TestStat_AGE <- (mean_AGE - 11)/(sd_AGE / nrow(sample)^0.5)
 
-H0_AGE <- ifelse(z_AGE > TestStat_AGE, "Do not reject H0", "Reject H0")
+H0_AGE <- ifelse(z_alpha_300_AGE > TestStat_AGE, "Do not reject H0", "Reject H0")
 
 cat("Age:", 
-    "\nThe critical value is", z_AGE,
+    "\nThe critical value is", z_alpha_300_AGE,
     "\nThe rejection region is to the right side of the critical value.",
     "\nThe value of the test statistic is", TestStat_AGE, 
     "\nThe statistical conclusion is:", H0_AGE, 
     "\n\n")
 
-z_EMP <- qnorm(alpha)
+z_alpha_300_EMP <- qt(alpha, 300)
 TestStat_EMP <- (mean_EMP - 100)/(ssd_EMP / nrow(sample)^0.5)
 
-H0_EMP <- ifelse(z_EMP < TestStat_EMP, "Do not reject H0", "Reject H0")
+H0_EMP <- ifelse(z_alpha_300_EMP < TestStat_EMP, "Do not reject H0", "Reject H0")
 
 cat("Employment:", 
-    "\nThe critical value is", z_EMP,
+    "\nThe critical value is", z_alpha_300_EMP,
     "\nThe rejection region is to the left side of the critical value.",
     "\nThe value of the test statistic is", TestStat_EMP, 
     "\nThe statistical conclusion is:", H0_EMP)
