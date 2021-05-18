@@ -212,11 +212,11 @@ where $p_7$ and $p_8$ refer to the population proportions of the companies that 
 ```{r}
 mean_DCOSTS <- mean(sample$DCOSTS)
 TestStat_DCOSTS <- (mean_DCOSTS - 0.7) / ((0.7 * (1 - 0.7)/nrow(sample))^0.5)
-pval_DCOSTS <- ifelse(TestStat_DCOSTS > 0, pnorm(-TestStat_DCOSTS, 0, 1), pnorm(TestStat_DCOSTS, 0, 1))
+pval_DCOSTS <- pnorm(-TestStat_DCOSTS, 0, 1)
 
 mean_DNEWHIRES <- mean(sample$DNEWHIRES)
 TestStat_DNEWHIRES <- (mean_DNEWHIRES - 0.5) / ((0.5 * (1 - 0.5)/nrow(sample))^0.5)
-pval_DNEWHIRES <- 2 * pnorm(-TestStat_DNEWHIRES, 0, 1)
+pval_DNEWHIRES <- 2 * ifelse(TestStat_DNEWHIRES >0, pnorm(TestStat_DNEWHIRES, 0, 1, lower.tail = FALSE), pnorm(TestStat_DNEWHIRES, 0, 1, lower.tail = TRUE))
 
 H0_DCOSTS <- ifelse(pval_DCOSTS > alpha, "Do not reject H0", "Reject H0")
 H0_DNEWHIRES <- ifelse((pval_DNEWHIRES > alpha), "Do not reject H0", "Reject H0")
