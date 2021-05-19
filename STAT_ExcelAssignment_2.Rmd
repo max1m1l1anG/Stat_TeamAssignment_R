@@ -243,25 +243,25 @@ where, $µ_2$ and $µ_4$ refer to the population means of the variables 2 and 4 
 ```{r}
 mean_AGE <- mean(sample$AGE)
 sd_AGE <- sd(sample$AGE)
-z_alpha_300_AGE <- qt(1-alpha, 300)
+t_alpha_300_AGE <- qt(1-alpha, 300)
 TestStat_AGE <- (mean_AGE - 11)/(sd_AGE / nrow(sample)^0.5)
 
-H0_AGE <- ifelse(z_alpha_300_AGE > TestStat_AGE, "Do not reject H0", "Reject H0")
+H0_AGE <- ifelse(t_alpha_300_AGE > TestStat_AGE, "Do not reject H0", "Reject H0")
 
 cat("Age:", 
-    "\nThe critical value is", z_alpha_300_AGE,
+    "\nThe critical value is", t_alpha_300_AGE,
     "\nThe rejection region is to the right side of the critical value.",
     "\nThe value of the test statistic is", TestStat_AGE, 
     "\nThe statistical conclusion is:", H0_AGE, 
     "\n\n")
 
-z_alpha_300_EMP <- qt(alpha, 300)
+t_alpha_300_EMP <- qt(alpha, 300)
 TestStat_EMP <- (mean_EMP - 100)/(ssd_EMP / nrow(sample)^0.5)
 
-H0_EMP <- ifelse(z_alpha_300_EMP < TestStat_EMP, "Do not reject H0", "Reject H0")
+H0_EMP <- ifelse(t_alpha_300_EMP < TestStat_EMP, "Do not reject H0", "Reject H0")
 
 cat("Employment:", 
-    "\nThe critical value is", z_alpha_300_EMP,
+    "\nThe critical value is", t_alpha_300_EMP,
     "\nThe rejection region is to the left side of the critical value.",
     "\nThe value of the test statistic is", TestStat_EMP, 
     "\nThe statistical conclusion is:", H0_EMP)
